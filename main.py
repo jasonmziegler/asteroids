@@ -7,7 +7,7 @@ from asteroidfield import AsteroidField
 from shot import Shot
 from logger import log_state
 from logger import log_event
-
+from scorepopup import ScorePopup
 
 def main():
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
@@ -26,18 +26,23 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    popups = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable,)
     Shot.containers = (shots, updatable, drawable)
-
+    ScorePopup.containers = (popups, updatable, drawable)
+    print("ScorePopup containers:", ScorePopup.containers)
     player = Player(x,y,constants.PLAYER_RADIUS)
 
     asteroidfield = AsteroidField()
     
     score = 0
+    
+
     font = pygame.font.Font(None, 36)
+    popup_font = pygame.font.Font(None, 24)
     while (True):
         log_state()
         for event in pygame.event.get():
@@ -49,12 +54,18 @@ def main():
         for asteroid in asteroids:
             for shot in shots:
                 if shot.collide_with(asteroid):
-                    if asteroid.radius == 3:
-                        score += 10
-                    elif asteroid.radius == 2:
-                        score += 20
+                    points = 0
+                    print(f"asteroid radius: {asteroid.radius}")
+                    if asteroid.radius == 60:
+                        points += 10
+                    elif asteroid.radius == 40:
+                        points += 20
                     else:
-                        score += 40
+                        points += 40
+                    score += points
+                    pos = asteroid.position.copy()
+                    ScorePopup(pos, points, popup_font)
+                    print("after spawn:", len(popups), len(updatable), len(drawable))
                     log_event("asteroid_shot")
                     shot.kill()
                     # asteroid.kill()
