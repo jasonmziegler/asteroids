@@ -35,7 +35,9 @@ def main():
     player = Player(x,y,constants.PLAYER_RADIUS)
 
     asteroidfield = AsteroidField()
-
+    
+    score = 0
+    font = pygame.font.Font(None, 36)
     while (True):
         log_state()
         for event in pygame.event.get():
@@ -47,6 +49,12 @@ def main():
         for asteroid in asteroids:
             for shot in shots:
                 if shot.collide_with(asteroid):
+                    if asteroid.radius == 3:
+                        score += 10
+                    elif asteroid.radius == 2:
+                        score += 20
+                    else:
+                        score += 40
                     log_event("asteroid_shot")
                     shot.kill()
                     # asteroid.kill()
@@ -57,6 +65,9 @@ def main():
                 sys.exit()
         for object in drawable:
             object.draw(screen)
+
+        score_surface = font.render(f"Score: {score}", True, "white")
+        screen.blit(score_surface, (10,10))
 
         pygame.display.flip()
         dt = clock.tick(60) / 1000
